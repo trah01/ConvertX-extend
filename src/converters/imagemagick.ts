@@ -1,6 +1,59 @@
 import { execFile as execFileOriginal } from "node:child_process";
 import { ExecFileFn } from "./types";
 
+type ImageMagickOptions = {
+  resizeWidth?: number;
+  resizeHeight?: number;
+  cropWidth?: number;
+  cropHeight?: number;
+  cropX?: number;
+  cropY?: number;
+};
+
+function isImageMagickOptions(options: unknown): options is ImageMagickOptions {
+  return typeof options === "object" && options !== null;
+}
+
+function getDimension(value: unknown): number | undefined {
+  return typeof value === "number" && Number.isSafeInteger(value) && value > 0 && value <= 100000
+    ? value
+    : undefined;
+}
+
+function getOffset(value: unknown): number | undefined {
+  return typeof value === "number" && Number.isSafeInteger(value) && value >= 0 && value <= 100000
+    ? value
+    : undefined;
+}
+
+function buildImageSizeArgs(options: unknown): string[] {
+  if (!isImageMagickOptions(options)) {
+    return [];
+  }
+
+  const resizeWidth = getDimension(options.resizeWidth);
+  const resizeHeight = getDimension(options.resizeHeight);
+  const cropWidth = getDimension(options.cropWidth);
+  const cropHeight = getDimension(options.cropHeight);
+  const cropX = getOffset(options.cropX);
+  const cropY = getOffset(options.cropY);
+  const args: string[] = [];
+
+  if (resizeWidth || resizeHeight) {
+    args.push("-resize", `${resizeWidth ?? ""}x${resizeHeight ?? ""}`);
+  }
+
+  if (cropWidth && cropHeight) {
+    if (cropX !== undefined || cropY !== undefined) {
+      args.push("-crop", `${cropWidth}x${cropHeight}+${cropX ?? 0}+${cropY ?? 0}`, "+repage");
+    } else {
+      args.push("-gravity", "center", "-crop", `${cropWidth}x${cropHeight}+0+0`, "+repage");
+    }
+  }
+
+  return args;
+}
+
 // declare possible conversions
 export const properties = {
   from: {
@@ -467,6 +520,8 @@ export function convert(
     inputArgs.push("-define", "emf:delegate=false", "-density", "300");
     outputArgs.push("-background", "white", "-alpha", "remove");
   }
+
+  outputArgs.push(...buildImageSizeArgs(options));
 
   return new Promise((resolve, reject) => {
     execFile(

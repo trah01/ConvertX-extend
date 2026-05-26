@@ -44,7 +44,7 @@ export const root = new Elysia().use(userService).get(
       user = { id: newUserId };
       if (!auth) {
         return {
-          message: "No auth cookie, perhaps your browser is blocking cookies.",
+          message: "没有认证 Cookie，可能是浏览器阻止了 Cookie。",
         };
       }
 
@@ -91,7 +91,7 @@ export const root = new Elysia().use(userService).get(
       .get(user.id) as { id: number };
 
     if (!jobId) {
-      return { message: "Cookies should be enabled to use this app." };
+      return { message: "请启用 Cookie 后再使用此应用。" };
     }
 
     jobId.set({
@@ -121,7 +121,7 @@ export const root = new Elysia().use(userService).get(
             `}
           >
             <article class="article">
-              <h1 class="mb-4 text-xl">Convert</h1>
+              <h1 class="mb-4 text-xl">文件转换</h1>
               <div class="mb-4 scrollbar-thin max-h-[50vh] overflow-y-auto">
                 <table
                   id="file-list"
@@ -143,7 +143,7 @@ export const root = new Elysia().use(userService).get(
                 `}
               >
                 <span>
-                  <b>Choose a file</b> or drag it here
+                  <b>选择文件</b> 或拖拽到这里
                 </span>
                 <input
                   type="file"
@@ -163,7 +163,7 @@ export const root = new Elysia().use(userService).get(
                 <input
                   type="search"
                   name="convert_to_search"
-                  placeholder="Search for conversions"
+                  placeholder="搜索可转换格式"
                   autocomplete="off"
                   class="w-full rounded-sm bg-neutral-800 p-4"
                 />
@@ -209,9 +209,9 @@ export const root = new Elysia().use(userService).get(
                   </article>
 
                   {/* Hidden element which determines the format to convert the file too and the converter to use */}
-                  <select name="convert_to" aria-label="Convert to" required hidden>
+                  <select name="convert_to" aria-label="转换为" required hidden>
                     <option selected disabled value="">
-                      Convert to
+                      转换为
                     </option>
                     {Object.entries(getAllTargets()).map(([converter, targets]) => (
                       <optgroup label={converter}>
@@ -225,13 +225,110 @@ export const root = new Elysia().use(userService).get(
                   </select>
                 </div>
               </article>
+              <article
+                id="image-options"
+                class="article hidden w-full flex-col gap-4"
+                aria-hidden="true"
+              >
+                <header>
+                  <h2 class="text-lg font-bold">图片尺寸</h2>
+                </header>
+                <div
+                  class={`
+                    grid grid-cols-1 gap-3
+                    sm:grid-cols-2
+                  `}
+                >
+                  <label class="flex flex-col gap-1 sm:col-span-2">
+                    <span>批量输出尺寸</span>
+                    <input
+                      type="text"
+                      name="batch_sizes"
+                      placeholder="例如：32,64,128,256 或 32x32,64x64"
+                      class="rounded-sm bg-neutral-800 p-3"
+                    />
+                  </label>
+                  <label class="flex flex-col gap-1">
+                    <span>缩放宽度</span>
+                    <input
+                      type="number"
+                      name="resize_width"
+                      min="1"
+                      max="100000"
+                      step="1"
+                      placeholder="自动"
+                      class="rounded-sm bg-neutral-800 p-3"
+                    />
+                  </label>
+                  <label class="flex flex-col gap-1">
+                    <span>缩放高度</span>
+                    <input
+                      type="number"
+                      name="resize_height"
+                      min="1"
+                      max="100000"
+                      step="1"
+                      placeholder="自动"
+                      class="rounded-sm bg-neutral-800 p-3"
+                    />
+                  </label>
+                  <label class="flex flex-col gap-1">
+                    <span>裁剪宽度</span>
+                    <input
+                      type="number"
+                      name="crop_width"
+                      min="1"
+                      max="100000"
+                      step="1"
+                      placeholder="不裁剪"
+                      class="rounded-sm bg-neutral-800 p-3"
+                    />
+                  </label>
+                  <label class="flex flex-col gap-1">
+                    <span>裁剪高度</span>
+                    <input
+                      type="number"
+                      name="crop_height"
+                      min="1"
+                      max="100000"
+                      step="1"
+                      placeholder="不裁剪"
+                      class="rounded-sm bg-neutral-800 p-3"
+                    />
+                  </label>
+                  <label class="flex flex-col gap-1">
+                    <span>裁剪 X</span>
+                    <input
+                      type="number"
+                      name="crop_x"
+                      min="0"
+                      max="100000"
+                      step="1"
+                      placeholder="居中"
+                      class="rounded-sm bg-neutral-800 p-3"
+                    />
+                  </label>
+                  <label class="flex flex-col gap-1">
+                    <span>裁剪 Y</span>
+                    <input
+                      type="number"
+                      name="crop_y"
+                      min="0"
+                      max="100000"
+                      step="1"
+                      placeholder="居中"
+                      class="rounded-sm bg-neutral-800 p-3"
+                    />
+                  </label>
+                </div>
+              </article>
               <input
                 class={`
                   w-full btn-primary opacity-100
                   disabled:cursor-not-allowed disabled:opacity-50
                 `}
                 type="submit"
-                value="Convert"
+                value="开始转换"
                 disabled
               />
             </form>

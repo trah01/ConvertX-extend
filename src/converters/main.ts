@@ -12,6 +12,7 @@ import {
   properties as propertiesGraphicsmagick,
 } from "./graphicsmagick";
 import { convert as convertImagemagick, properties as propertiesImagemagick } from "./imagemagick";
+import { convert as convertIcns, properties as propertiesIcns } from "./icns";
 import { convert as convertInkscape, properties as propertiesInkscape } from "./inkscape";
 import { convert as convertLibheif, properties as propertiesLibheif } from "./libheif";
 import { convert as convertLibjxl, properties as propertiesLibjxl } from "./libjxl";
@@ -109,6 +110,10 @@ const properties: Record<
     properties: propertiesImagemagick,
     converter: convertImagemagick,
   },
+  icns: {
+    properties: propertiesIcns,
+    converter: convertIcns,
+  },
   graphicsmagick: {
     properties: propertiesGraphicsmagick,
     converter: convertGraphicsmagick,
@@ -148,6 +153,55 @@ function chunks<T>(arr: T[], size: number): T[][] {
   );
 }
 
+type BatchImageOptions = {
+  batchSizes?: { width: number; height: number }[];
+};
+
+type ConvertResult = {
+  status: string;
+  errorMessage?: string;
+};
+
+function getBatchSizes(options: unknown): { width: number; height: number }[] {
+  if (typeof options !== "object" || options === null || !("batchSizes" in options)) {
+    return [];
+  }
+
+  const sizes = (options as BatchImageOptions).batchSizes;
+  if (!Array.isArray(sizes)) {
+    return [];
+  }
+
+  return sizes.filter(
+    (size) =>
+      Number.isSafeInteger(size.width) &&
+      Number.isSafeInteger(size.height) &&
+      size.width > 0 &&
+      size.height > 0,
+  );
+}
+
+function withResizeOptions(options: unknown, width: number, height: number): unknown {
+  return {
+    ...(typeof options === "object" && options !== null ? options : {}),
+    resizeWidth: width,
+    resizeHeight: height,
+  };
+}
+
+function getOutputFileName(fileName: string, originalExt: string, newExt: string, suffix = "") {
+  if (originalExt === "") {
+    return `${fileName}${suffix}.${newExt}`;
+  }
+
+  const extensionStart = fileName.lastIndexOf(`.${originalExt}`);
+  if (extensionStart === -1) {
+    return `${fileName}${suffix}.${newExt}`;
+  }
+
+  return `${fileName.slice(0, extensionStart)}${suffix}.${newExt}`;
+}
+
 export async function handleConvert(
   fileNames: string[],
   userUploadsDir: string,
@@ -155,10 +209,12 @@ export async function handleConvert(
   convertTo: string,
   converterName: string,
   jobId: Cookie<string | undefined>,
+  options: unknown = {},
 ) {
   const query = db.query(
-    "INSERT INTO file_names (job_id, file_name, output_file_name, status) VALUES (?1, ?2, ?3, ?4)",
+    "INSERT INTO file_names (job_id, file_name, output_file_name, status, error_message) VALUES (?1, ?2, ?3, ?4, ?5)",
   );
+  let failedCount = 0;
 
   for (const chunk of chunks(fileNames, MAX_CONVERT_PROCESS)) {
     const toProcess: Promise<string>[] = [];
@@ -167,31 +223,61 @@ export async function handleConvert(
       const fileTypeOrig = fileName.includes(".") ? (fileName.split(".").pop() ?? "") : "";
       const fileType = normalizeFiletype(fileTypeOrig);
       const newFileExt = normalizeOutputFiletype(convertTo);
-      let newFileName: string;
-      if (fileTypeOrig === "") {
-        newFileName = `${fileName}.${newFileExt}`;
-      } else {
-        newFileName = fileName.replace(
-          new RegExp(`${fileTypeOrig}(?!.*${fileTypeOrig})`),
-          newFileExt,
+      const batchSizes = converterName === "imagemagick" ? getBatchSizes(options) : [];
+      const outputPlans =
+        batchSizes.length > 0
+          ? batchSizes.map((size) => ({
+              fileName: getOutputFileName(
+                fileName,
+                fileTypeOrig,
+                newFileExt,
+                `-${size.width}x${size.height}`,
+              ),
+              options: withResizeOptions(options, size.width, size.height),
+            }))
+          : [
+              {
+                fileName: getOutputFileName(fileName, fileTypeOrig, newFileExt),
+                options,
+              },
+            ];
+
+      for (const outputPlan of outputPlans) {
+        const targetPath = `${userOutputDir}${outputPlan.fileName}`;
+        toProcess.push(
+          new Promise((resolve, reject) => {
+            mainConverter(
+              filePath,
+              fileType,
+              convertTo,
+              targetPath,
+              outputPlan.options,
+              converterName,
+            )
+              .then((r) => {
+                if (jobId.value) {
+                  query.run(
+                    jobId.value,
+                    fileName,
+                    outputPlan.fileName,
+                    r.status,
+                    r.errorMessage ?? null,
+                  );
+                }
+                if (r.status !== "Done") {
+                  failedCount++;
+                }
+                resolve(r.status);
+              })
+              .catch((c) => reject(c));
+          }),
         );
       }
-      const targetPath = `${userOutputDir}${newFileName}`;
-      toProcess.push(
-        new Promise((resolve, reject) => {
-          mainConverter(filePath, fileType, convertTo, targetPath, {}, converterName)
-            .then((r) => {
-              if (jobId.value) {
-                query.run(jobId.value, fileName, newFileName, r);
-              }
-              resolve(r);
-            })
-            .catch((c) => reject(c));
-        }),
-      );
     }
     await Promise.all(toProcess);
   }
+
+  return { failedCount };
 }
 
 async function mainConverter(
@@ -201,7 +287,7 @@ async function mainConverter(
   targetPath: string,
   options?: unknown,
   converterName?: string,
-) {
+): Promise<ConvertResult> {
   const fileType = normalizeFiletype(fileTypeOriginal);
 
   let converterFunc: (typeof properties)["libjxl"]["converter"] | undefined;
@@ -230,8 +316,12 @@ async function mainConverter(
   }
 
   if (!converterFunc) {
-    console.log(`No available converter supports converting from ${fileType} to ${convertTo}.`);
-    return "File type not supported";
+    const errorMessage = `No available converter supports converting from ${fileType} to ${convertTo}.`;
+    console.log(errorMessage);
+    return {
+      status: "File type not supported",
+      errorMessage,
+    };
   }
 
   try {
@@ -243,16 +333,20 @@ async function mainConverter(
     );
 
     if (typeof result === "string") {
-      return result;
+      return { status: result };
     }
 
-    return "Done";
+    return { status: "Done" };
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
     console.error(
       `Failed to convert ${inputFilePath} from ${fileType} to ${convertTo} using ${converterName}.`,
       error,
     );
-    return "Failed, check logs";
+    return {
+      status: "Failed, check logs",
+      errorMessage,
+    };
   }
 }
 

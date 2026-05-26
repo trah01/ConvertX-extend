@@ -4,6 +4,7 @@ export class Filename {
   file_name!: string;
   output_file_name!: string;
   status!: string;
+  error_message?: string;
 }
 
 export class Jobs {
@@ -18,6 +19,7 @@ export class Jobs {
 
 export class User {
   id!: number;
-  email!: string;
+  username!: string;
   password!: string;
+  is_admin!: number;
 }

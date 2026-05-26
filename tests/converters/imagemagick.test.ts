@@ -163,3 +163,103 @@ test("convert respects emf as input filetype", async () => {
   );
   expect(loggedMessage).toBe("stdout: Fake stdout");
 });
+
+test("convert applies resize options", async () => {
+  const mockExecFile: ExecFileFn = (
+    _cmd: string,
+    _args: string[],
+    callback: (err: ExecFileException | null, stdout: string, stderr: string) => void,
+  ) => {
+    calls.push(_args);
+    callback(null, "", "");
+  };
+
+  const result = await convert(
+    "input.png",
+    "png",
+    "webp",
+    "output.webp",
+    { resizeWidth: 800, resizeHeight: 600 },
+    mockExecFile,
+  );
+
+  expect(result).toBe("Done");
+  expect(calls[0]).toEqual(["input.png", "-resize", "800x600", "output.webp"]);
+});
+
+test("convert applies resize with one auto dimension", async () => {
+  const mockExecFile: ExecFileFn = (
+    _cmd: string,
+    _args: string[],
+    callback: (err: ExecFileException | null, stdout: string, stderr: string) => void,
+  ) => {
+    calls.push(_args);
+    callback(null, "", "");
+  };
+
+  const result = await convert(
+    "input.png",
+    "png",
+    "webp",
+    "output.webp",
+    { resizeWidth: 800 },
+    mockExecFile,
+  );
+
+  expect(result).toBe("Done");
+  expect(calls[0]).toEqual(["input.png", "-resize", "800x", "output.webp"]);
+});
+
+test("convert applies centered crop options", async () => {
+  const mockExecFile: ExecFileFn = (
+    _cmd: string,
+    _args: string[],
+    callback: (err: ExecFileException | null, stdout: string, stderr: string) => void,
+  ) => {
+    calls.push(_args);
+    callback(null, "", "");
+  };
+
+  const result = await convert(
+    "input.png",
+    "png",
+    "webp",
+    "output.webp",
+    { cropWidth: 320, cropHeight: 240 },
+    mockExecFile,
+  );
+
+  expect(result).toBe("Done");
+  expect(calls[0]).toEqual([
+    "input.png",
+    "-gravity",
+    "center",
+    "-crop",
+    "320x240+0+0",
+    "+repage",
+    "output.webp",
+  ]);
+});
+
+test("convert applies crop offset options", async () => {
+  const mockExecFile: ExecFileFn = (
+    _cmd: string,
+    _args: string[],
+    callback: (err: ExecFileException | null, stdout: string, stderr: string) => void,
+  ) => {
+    calls.push(_args);
+    callback(null, "", "");
+  };
+
+  const result = await convert(
+    "input.png",
+    "png",
+    "webp",
+    "output.webp",
+    { cropWidth: 320, cropHeight: 240, cropX: 10, cropY: 20 },
+    mockExecFile,
+  );
+
+  expect(result).toBe("Done");
+  expect(calls[0]).toEqual(["input.png", "-crop", "320x240+10+20", "+repage", "output.webp"]);
+});

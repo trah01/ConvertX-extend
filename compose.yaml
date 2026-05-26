@@ -1,22 +1,23 @@
-# This compose file is for development and testing purposes only. See README for production deployment instructions.
-
 services:
   convertx:
+    container_name: convertx
     build:
       context: .
-      # dockerfile: Debian.Dockerfile
+      dockerfile: Dockerfile
+    image: convertx-local:latest
+    restart: unless-stopped
+    ports:
+      - "${CONVERTX_PORT:-3000}:3000"
+    environment:
+      JWT_SECRET: "${JWT_SECRET:?set JWT_SECRET in .env}"
+      HTTP_ALLOWED: "${HTTP_ALLOWED:-true}"
+      ACCOUNT_REGISTRATION: "${ACCOUNT_REGISTRATION:-false}"
+      ALLOW_UNAUTHENTICATED: "${ALLOW_UNAUTHENTICATED:-false}"
+      AUTO_DELETE_EVERY_N_HOURS: "${AUTO_DELETE_EVERY_N_HOURS:-1}"
+      TZ: "${TZ:-Asia/Shanghai}"
+      WEBROOT: "${WEBROOT:-}"
+      HIDE_HISTORY: "${HIDE_HISTORY:-false}"
+      UNAUTHENTICATED_USER_SHARING: "${UNAUTHENTICATED_USER_SHARING:-false}"
+      QTWEBENGINE_CHROMIUM_FLAGS: "--no-sandbox"
     volumes:
       - ./data:/app/data
-    environment: # Defaults are listed below. All are optional.
-      - ACCOUNT_REGISTRATION=true # true or false, doesn't matter for the first account (e.g. keep this to false if you only want one account)
-      - JWT_SECRET=aLongAndSecretStringUsedToSignTheJSONWebToken1234 # will use randomUUID() by default
-      - HTTP_ALLOWED=false # setting this to true is unsafe, only set this to true locally
-      - ALLOW_UNAUTHENTICATED=false # allows anyone to use the service without logging in, only set this to true locally
-      - AUTO_DELETE_EVERY_N_HOURS=1 # checks every n hours for files older then n hours and deletes them, set to 0 to disable
-      # - FFMPEG_ARGS=-hwaccel vulkan # additional arguments to pass to ffmpeg
-      # - WEBROOT=/convertx # the root path of the web interface, leave empty to disable
-      # - HIDE_HISTORY=true # hides the history tab in the web interface, defaults to false
-      - TZ=Europe/Stockholm # set your timezone, defaults to UTC
-      # - UNAUTHENTICATED_USER_SHARING=true # for use with ALLOW_UNAUTHENTICATED=true to share history with all unauthenticated users / devices
-    ports:
-      - 3000:3000

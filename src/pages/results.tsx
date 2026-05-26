@@ -9,6 +9,14 @@ import { DeleteIcon } from "../icons/delete";
 import { EyeIcon } from "../icons/eye";
 import { userService } from "./user";
 
+function displayStatus(status: string) {
+  if (status === "Done") return "已完成";
+  if (status === "Failed, check logs") return "失败，请查看日志";
+  if (status === "File type not supported") return "不支持的文件类型";
+  if (status === "not started") return "未开始";
+  return status;
+}
+
 function ResultsArticle({
   job,
   files,
@@ -21,7 +29,7 @@ function ResultsArticle({
   return (
     <article class="article">
       <div class="mb-4 flex items-center justify-between">
-        <h1 class="text-xl">Results</h1>
+        <h1 class="text-xl">转换结果</h1>
         <div class="flex flex-row gap-4">
           <a
             style={files.length !== job.num_files ? "pointer-events: none;" : ""}
@@ -29,19 +37,19 @@ function ResultsArticle({
             href={`${WEBROOT}/delete/${job.id}`}
             {...(files.length !== job.num_files ? { disabled: true, "aria-busy": "true" } : "")}
           >
-            <DeleteIcon /> <p>Delete</p>
+            <DeleteIcon /> <p>删除</p>
           </a>
           <a
             style={files.length !== job.num_files ? "pointer-events: none;" : ""}
             href={`${WEBROOT}/archive/${job.id}`}
-            download={`converted_files_${job.id}.tar`}
+            download={`converted_files_${job.id}.zip`}
             class="flex btn-primary flex-row gap-2 text-contrast"
             {...(files.length !== job.num_files ? { disabled: true, "aria-busy": "true" } : "")}
           >
-            <DownloadIcon /> <p>Tar</p>
+            <DownloadIcon /> <p>打包下载</p>
           </a>
           <button class="flex btn-primary flex-row gap-2 text-contrast" onclick="downloadAll()">
-            <DownloadIcon /> <p>All</p>
+            <DownloadIcon /> <p>全部下载</p>
           </button>
         </div>
       </div>
@@ -72,7 +80,7 @@ function ResultsArticle({
                 sm:px-4
               `}
             >
-              Converted File Name
+              转换后文件名
             </th>
             <th
               class={`
@@ -80,7 +88,7 @@ function ResultsArticle({
                 sm:px-4
               `}
             >
-              Status
+              状态
             </th>
             <th
               class={`
@@ -88,7 +96,15 @@ function ResultsArticle({
                 sm:px-4
               `}
             >
-              Actions
+              失败详情
+            </th>
+            <th
+              class={`
+                p-2
+                sm:px-4
+              `}
+            >
+              操作
             </th>
           </tr>
         </thead>
@@ -98,7 +114,17 @@ function ResultsArticle({
               <td safe class="max-w-[20vw] truncate">
                 {file.output_file_name}
               </td>
-              <td safe>{file.status}</td>
+              <td safe>{displayStatus(file.status)}</td>
+              <td class="max-w-[30vw] text-sm text-red-300">
+                {file.error_message ? (
+                  <details>
+                    <summary class="cursor-pointer">查看详情</summary>
+                    <pre class="mt-2 whitespace-pre-wrap break-words" safe>
+                      {file.error_message}
+                    </pre>
+                  </details>
+                ) : null}
+              </td>
               <td class="flex flex-row gap-4">
                 <a
                   class={`
@@ -146,7 +172,7 @@ export const results = new Elysia()
       if (!job) {
         set.status = 404;
         return {
-          message: "Job not found.",
+          message: "任务不存在。",
         };
       }
 
@@ -158,7 +184,7 @@ export const results = new Elysia()
         .all(params.jobId);
 
       return (
-        <BaseHtml webroot={WEBROOT} title="ConvertX | Result">
+        <BaseHtml webroot={WEBROOT} title="ConvertX | 转换结果">
           <>
             <Header webroot={WEBROOT} allowUnauthenticated={ALLOW_UNAUTHENTICATED} loggedIn />
             <main
@@ -192,7 +218,7 @@ export const results = new Elysia()
       if (!job) {
         set.status = 404;
         return {
-          message: "Job not found.",
+          message: "任务不存在。",
         };
       }
 
