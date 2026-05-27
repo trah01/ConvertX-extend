@@ -11,9 +11,8 @@ ConvertX-extend 是基于原版 [ConvertX](https://github.com/C4illin/ConvertX) 
 - 调整项目名为 `ConvertX-extend`
 - 优化中文界面文案
 - 增加图片大小设置
-- 增加 Docker Hub 镜像打包和推送 workflow
 - 增加中文注释的 `.env.example`
-- 精简上游仓库中暂时用不上的配置文件和 workflow
+- 精简上游仓库中暂时用不上的配置文件
 
 ### 为什么没有 fork
 
@@ -32,7 +31,7 @@ ConvertX-extend 是基于原版 [ConvertX](https://github.com/C4illin/ConvertX) 
 
 ```bash
 cp .env.example .env
-docker compose up -d --build
+docker compose up -d
 ```
 
 也可以直接参考下面的 Compose 配置：
@@ -67,38 +66,6 @@ http://localhost:3000
 chown -R "$USER:$USER" ./data
 ```
 
-### 本地构建 Docker 镜像
-
-```bash
-docker compose up --build
-```
-
-当前 `compose.yaml` 会构建本地镜像 `convertx-extend:latest`，默认端口是 `${CONVERTX_PORT:-3000}`。
-
-### 推送到 Docker Hub
-
-`.github/workflows/docker-publish.yml` 会构建 `linux/amd64` 和 `linux/arm64` 多架构镜像，并在推送到 `main`、推送版本 tag 或手动触发 workflow 时发布到 Docker Hub。
-
-需要在 GitHub 仓库设置里配置：
-
-| 名称                 | 类型                | 必需 | 说明                                      |
-| -------------------- | ------------------- | ---- | ----------------------------------------- |
-| `DOCKERHUB_USERNAME` | Repository variable | 是   | Docker Hub 用户名或组织名                 |
-| `DOCKERHUB_TOKEN`    | Repository secret   | 是   | Docker Hub Access Token                   |
-| `DOCKERHUB_IMAGE`    | Repository variable | 否   | 镜像名，不设置时默认为 `convertx-extend` |
-
-最终镜像名是：
-
-```text
-DOCKERHUB_USERNAME/DOCKERHUB_IMAGE
-```
-
-如果没有设置 `DOCKERHUB_IMAGE`，则是：
-
-```text
-DOCKERHUB_USERNAME/convertx-extend
-```
-
 ### 环境变量
 
 大部分变量都是可选的，但正式部署时强烈建议设置 `JWT_SECRET`。
@@ -117,22 +84,6 @@ DOCKERHUB_USERNAME/convertx-extend
 | `LANGUAGE`                     | `en`                   | 日期格式化语言，使用 BCP 47 语言标签                    |
 | `UNAUTHENTICATED_USER_SHARING` | `false`                | 未登录用户之间是否共享转换历史                          |
 | `MAX_CONVERT_PROCESS`          | `0`                    | 最大并发转换进程数量，`0` 表示不限制                    |
-
-### 开发
-
-安装 [Bun](https://bun.sh/) 后运行：
-
-```bash
-bun install
-bun run dev
-```
-
-常用检查：
-
-```bash
-bun run build
-bun run lint
-```
 
 ### 支持的转换器
 
@@ -177,9 +128,8 @@ This version mainly includes:
 - Project rename to `ConvertX-extend`
 - Chinese UI copy adjustments
 - Image size options
-- Docker Hub image build and publish workflow
 - Chinese-commented `.env.example`
-- Removal of upstream files and workflows that are not needed here
+- Removal of upstream files that are not needed here
 
 ### Why This Repository Is Not a Fork
 
@@ -198,7 +148,7 @@ Recommended startup:
 
 ```bash
 cp .env.example .env
-docker compose up -d --build
+docker compose up -d
 ```
 
 Example Compose service:
@@ -233,38 +183,6 @@ If you get `unable to open database file`, fix the data directory permissions:
 chown -R "$USER:$USER" ./data
 ```
 
-### Local Docker Build
-
-```bash
-docker compose up --build
-```
-
-The included `compose.yaml` builds `convertx-extend:latest` and serves the app on `${CONVERTX_PORT:-3000}`.
-
-### Docker Hub Publishing
-
-`.github/workflows/docker-publish.yml` builds multi-architecture images for `linux/amd64` and `linux/arm64`, then pushes to Docker Hub on `main`, version tags, or manual workflow dispatch.
-
-Configure these in GitHub repository settings:
-
-| Name                 | Type                    | Required | Description                                      |
-| -------------------- | ----------------------- | -------- | ------------------------------------------------ |
-| `DOCKERHUB_USERNAME` | Repository variable     | Yes      | Docker Hub username or organization namespace    |
-| `DOCKERHUB_TOKEN`    | Repository secret       | Yes      | Docker Hub access token                          |
-| `DOCKERHUB_IMAGE`    | Repository variable     | No       | Docker Hub image name. Defaults to `convertx-extend` |
-
-The published image name is:
-
-```text
-DOCKERHUB_USERNAME/DOCKERHUB_IMAGE
-```
-
-If `DOCKERHUB_IMAGE` is not set:
-
-```text
-DOCKERHUB_USERNAME/convertx-extend
-```
-
 ### Environment Variables
 
 Most variables are optional, but `JWT_SECRET` is strongly recommended for persistent deployments.
@@ -283,22 +201,6 @@ Most variables are optional, but `JWT_SECRET` is strongly recommended for persis
 | `LANGUAGE`                     | `en`                     | BCP 47 language tag used for date formatting                                |
 | `UNAUTHENTICATED_USER_SHARING` | `false`                  | Share conversion history between unauthenticated users                      |
 | `MAX_CONVERT_PROCESS`          | `0`                      | Maximum concurrent conversion processes. Set `0` for unlimited              |
-
-### Development
-
-Install [Bun](https://bun.sh/) and run:
-
-```bash
-bun install
-bun run dev
-```
-
-Useful checks:
-
-```bash
-bun run build
-bun run lint
-```
 
 ### Supported Converters
 
