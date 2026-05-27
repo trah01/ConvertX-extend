@@ -19,7 +19,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
+  DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME || vars.DOCKERHUB_USERNAME }}
   IMAGE_NAME: ${{ vars.DOCKERHUB_IMAGE || 'convertx-extend' }}
 
 jobs:
@@ -34,7 +34,7 @@ jobs:
       - name: Prepare Docker Hub image name
         run: |
           if [ -z "$DOCKERHUB_USERNAME" ]; then
-            echo "Repository variable DOCKERHUB_USERNAME is required." >&2
+            echo "Secret or repository variable DOCKERHUB_USERNAME is required." >&2
             exit 1
           fi
 
