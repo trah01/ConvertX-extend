@@ -39,7 +39,7 @@ docker compose up -d
 ```yml
 services:
   convertx-extend:
-    image: <dockerhub-username>/convertx-extend:latest
+    image: trah01/convertx-extend:latest
     container_name: convertx-extend
     restart: unless-stopped
     ports:
@@ -156,7 +156,7 @@ Example Compose service:
 ```yml
 services:
   convertx-extend:
-    image: <dockerhub-username>/convertx-extend:latest
+    image: trah01/convertx-extend:latest
     container_name: convertx-extend
     restart: unless-stopped
     ports:

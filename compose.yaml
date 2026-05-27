@@ -3,10 +3,7 @@ name: convertx-extend
 services:
   convertx-extend:
     container_name: convertx-extend
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: convertx-extend:latest
+    image: trah01/convertx-extend:latest
     restart: unless-stopped
     ports:
       # 宿主机访问端口，默认 http://localhost:3000
