@@ -1,5 +1,6 @@
 FROM debian:testing-slim AS base
-LABEL org.opencontainers.image.source="https://github.com/C4illin/ConvertX"
+LABEL org.opencontainers.image.title="ConvertX-extend"
+LABEL org.opencontainers.image.description="Extended self-hosted file converter based on ConvertX"
 WORKDIR /app
 
 # install bun

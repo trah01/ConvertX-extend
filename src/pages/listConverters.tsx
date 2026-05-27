@@ -9,7 +9,7 @@ export const listConverters = new Elysia().use(userService).get(
   "/converters",
   async () => {
     return (
-      <BaseHtml webroot={WEBROOT} title="ConvertX | 转换器">
+      <BaseHtml webroot={WEBROOT} title="ConvertX-extend | 转换器">
         <>
           <Header webroot={WEBROOT} allowUnauthenticated={ALLOW_UNAUTHENTICATED} loggedIn />
           <main

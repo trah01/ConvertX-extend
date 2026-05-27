@@ -231,7 +231,7 @@ export const root = new Elysia().use(userService).get(
                 aria-hidden="true"
               >
                 <header>
-                  <h2 class="text-lg font-bold">图片尺寸</h2>
+                  <h2 class="text-lg font-bold">调整图片大小（可选）</h2>
                 </header>
                 <div
                   class={`
@@ -240,16 +240,16 @@ export const root = new Elysia().use(userService).get(
                   `}
                 >
                   <label class="flex flex-col gap-1 sm:col-span-2">
-                    <span>批量输出尺寸</span>
+                    <span>同时生成多个大小</span>
                     <input
                       type="text"
                       name="batch_sizes"
-                      placeholder="例如：32,64,128,256 或 32x32,64x64"
+                      placeholder="例如：32,64,128 或 32x32,64x64"
                       class="rounded-sm bg-neutral-800 p-3"
                     />
                   </label>
                   <label class="flex flex-col gap-1">
-                    <span>缩放宽度</span>
+                    <span>新图片宽度</span>
                     <input
                       type="number"
                       name="resize_width"
@@ -261,7 +261,7 @@ export const root = new Elysia().use(userService).get(
                     />
                   </label>
                   <label class="flex flex-col gap-1">
-                    <span>缩放高度</span>
+                    <span>新图片高度</span>
                     <input
                       type="number"
                       name="resize_height"
@@ -273,7 +273,7 @@ export const root = new Elysia().use(userService).get(
                     />
                   </label>
                   <label class="flex flex-col gap-1">
-                    <span>裁剪宽度</span>
+                    <span>保留区域宽度</span>
                     <input
                       type="number"
                       name="crop_width"
@@ -285,7 +285,7 @@ export const root = new Elysia().use(userService).get(
                     />
                   </label>
                   <label class="flex flex-col gap-1">
-                    <span>裁剪高度</span>
+                    <span>保留区域高度</span>
                     <input
                       type="number"
                       name="crop_height"
@@ -297,7 +297,7 @@ export const root = new Elysia().use(userService).get(
                     />
                   </label>
                   <label class="flex flex-col gap-1">
-                    <span>裁剪 X</span>
+                    <span>从左边开始的位置</span>
                     <input
                       type="number"
                       name="crop_x"
@@ -309,7 +309,7 @@ export const root = new Elysia().use(userService).get(
                     />
                   </label>
                   <label class="flex flex-col gap-1">
-                    <span>裁剪 Y</span>
+                    <span>从上边开始的位置</span>
                     <input
                       type="number"
                       name="crop_y"

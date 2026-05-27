@@ -1,23 +1,37 @@
+name: convertx-extend
+
 services:
-  convertx:
-    container_name: convertx
+  convertx-extend:
+    container_name: convertx-extend
     build:
       context: .
       dockerfile: Dockerfile
-    image: convertx-local:latest
+    image: convertx-extend:latest
     restart: unless-stopped
     ports:
+      # 宿主机访问端口，默认 http://localhost:3000
       - "${CONVERTX_PORT:-3000}:3000"
     environment:
+      # JWT 签名密钥；生产环境必须在 .env 中设置为长随机字符串。
       JWT_SECRET: "${JWT_SECRET:?set JWT_SECRET in .env}"
+      # 是否允许 HTTP 访问；本地部署常用 true，公网建议配 HTTPS 并设为 false。
       HTTP_ALLOWED: "${HTTP_ALLOWED:-true}"
+      # 是否允许用户自行注册账号。
       ACCOUNT_REGISTRATION: "${ACCOUNT_REGISTRATION:-false}"
+      # 是否允许未登录用户使用转换功能；公网环境不建议开启。
       ALLOW_UNAUTHENTICATED: "${ALLOW_UNAUTHENTICATED:-false}"
+      # 自动清理文件的间隔小时数；设为 0 可关闭自动清理。
       AUTO_DELETE_EVERY_N_HOURS: "${AUTO_DELETE_EVERY_N_HOURS:-1}"
+      # 容器时区。
       TZ: "${TZ:-Asia/Shanghai}"
+      # 应用子路径，例如 /convert；为空时部署在根路径。
       WEBROOT: "${WEBROOT:-}"
+      # 是否隐藏历史记录页面。
       HIDE_HISTORY: "${HIDE_HISTORY:-false}"
+      # 未登录用户之间是否共享转换历史。
       UNAUTHENTICATED_USER_SHARING: "${UNAUTHENTICATED_USER_SHARING:-false}"
+      # LibreOffice/Calibre 等依赖在容器内运行时需要禁用 Chromium sandbox。
       QTWEBENGINE_CHROMIUM_FLAGS: "--no-sandbox"
     volumes:
+      # 持久化数据库和转换文件。
       - ./data:/app/data

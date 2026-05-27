@@ -39,7 +39,7 @@ export const history = new Elysia().use(userService).get(
     userJobs = userJobs.filter((job) => job.num_files > 0);
 
     return (
-      <BaseHtml webroot={WEBROOT} title="ConvertX | 历史记录">
+      <BaseHtml webroot={WEBROOT} title="ConvertX-extend | 历史记录">
         <>
           <Header
             webroot={WEBROOT}

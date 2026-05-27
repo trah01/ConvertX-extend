@@ -2,7 +2,7 @@ import { version } from "../../package.json";
 
 export const BaseHtml = ({
   children,
-  title = "ConvertX",
+  title = "ConvertX-extend",
   webroot = "",
 }: {
   children: JSX.Element;
@@ -25,7 +25,7 @@ export const BaseHtml = ({
       {children}
       <footer class="w-full">
         <div class="p-4 text-center text-sm text-neutral-500">
-          <span>由 </span>
+          <span>由 ConvertX-extend 驱动 v{version || ""}，基于 </span>
           <a
             href="https://github.com/C4illin/ConvertX"
             class={`
@@ -33,9 +33,8 @@ export const BaseHtml = ({
               hover:text-accent-500
             `}
           >
-            ConvertX{" "}
+            ConvertX
           </a>
-          <span safe> 驱动 v{version || ""}</span>
         </div>
       </footer>
     </body>

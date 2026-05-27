@@ -1,5 +1,5 @@
 {
-  "name": "convertx-frontend",
+  "name": "convertx-extend",
   "version": "0.17.0",
   "scripts": {
     "dev": "bun run --watch src/index.tsx",

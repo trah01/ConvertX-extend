@@ -184,7 +184,7 @@ export const results = new Elysia()
         .all(params.jobId);
 
       return (
-        <BaseHtml webroot={WEBROOT} title="ConvertX | 转换结果">
+        <BaseHtml webroot={WEBROOT} title="ConvertX-extend | 转换结果">
           <>
             <Header webroot={WEBROOT} allowUnauthenticated={ALLOW_UNAUTHENTICATED} loggedIn />
             <main

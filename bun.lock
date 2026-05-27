@@ -2,7 +2,7 @@
   "lockfileVersion": 1,
   "workspaces": {
     "": {
-      "name": "convertx-frontend",
+      "name": "convertx-extend",
       "dependencies": {
         "@elysiajs/html": "^1.4.0",
         "@elysiajs/jwt": "^1.4.1",

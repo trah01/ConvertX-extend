@@ -79,14 +79,14 @@ export const user = new Elysia()
     }
 
     return (
-      <BaseHtml title="ConvertX | 初始化" webroot={WEBROOT}>
+      <BaseHtml title="ConvertX-extend | 初始化" webroot={WEBROOT}>
         <main
           class={`
             mx-auto w-full max-w-4xl flex-1 px-2
             sm:px-4
           `}
         >
-          <h1 class="my-8 text-3xl">欢迎使用 ConvertX！</h1>
+          <h1 class="my-8 text-3xl">欢迎使用 ConvertX-extend！</h1>
           <article class="article p-0">
             <header class="w-full bg-neutral-800 p-4">创建你的账户</header>
             <form method="post" action={`${WEBROOT}/register`} class="p-4">
@@ -116,19 +116,7 @@ export const user = new Elysia()
               </fieldset>
               <input type="submit" value="创建账户" class="btn-primary" />
             </form>
-            <footer class="p-4">
-              如有问题，请到{" "}
-              <a
-                class={`
-                  text-accent-500 underline
-                  hover:text-accent-400
-                `}
-                href="https://github.com/C4illin/ConvertX"
-              >
-                GitHub
-              </a>
-              {" "}反馈。
-            </footer>
+            <footer class="p-4">如有问题，请到当前项目仓库反馈。</footer>
           </article>
         </main>
       </BaseHtml>
@@ -140,7 +128,7 @@ export const user = new Elysia()
     }
 
     return (
-      <BaseHtml webroot={WEBROOT} title="ConvertX | 注册">
+      <BaseHtml webroot={WEBROOT} title="ConvertX-extend | 注册">
         <>
           <Header
             webroot={WEBROOT}
@@ -280,7 +268,7 @@ export const user = new Elysia()
       }
 
       return (
-        <BaseHtml webroot={WEBROOT} title="ConvertX | 登录">
+        <BaseHtml webroot={WEBROOT} title="ConvertX-extend | 登录">
           <>
             <Header
               webroot={WEBROOT}
@@ -425,7 +413,7 @@ export const user = new Elysia()
         : [];
 
       return (
-        <BaseHtml webroot={WEBROOT} title="ConvertX | 账户">
+        <BaseHtml webroot={WEBROOT} title="ConvertX-extend | 账户">
           <>
             <Header
               webroot={WEBROOT}

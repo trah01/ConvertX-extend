@@ -1,6 +1,6 @@
 {
-  "name": "ConvertX | Self Hosted File Converter",
-  "short_name": "ConvertX",
+  "name": "ConvertX-extend | Self Hosted File Converter",
+  "short_name": "ConvertX-extend",
   "icons": [
     {
       "src": "/android-chrome-192x192.png",

@@ -93,7 +93,7 @@ export const Header = ({
         <ul>
           <li>
             <strong>
-              <a href={`${webroot}/`}>ConvertX</a>
+              <a href={`${webroot}/`}>ConvertX-extend</a>
             </strong>
           </li>
         </ul>
