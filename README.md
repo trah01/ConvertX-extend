@@ -10,7 +10,8 @@ ConvertX-extend 是基于原版 [ConvertX](https://github.com/C4illin/ConvertX) 
 
 - 调整项目名为 `ConvertX-extend`
 - 优化中文界面文案
-- 增加图片大小设置
+- 增加图片大小设置，支持 ImageMagick、GraphicsMagick 和 `icns` 图标生成
+- 优化格式搜索，`icns` 可通过 `ins`、`lns`、`apple`、`icon` 等关键词找到
 - 增加中文注释的 `.env.example`
 - 精简上游仓库中暂时用不上的配置文件
 
@@ -77,7 +78,7 @@ chown -R "$USER:$USER" ./data
 | `HTTP_ALLOWED`                 | `false`                | 是否允许 HTTP 访问，本地部署可设为 `true`               |
 | `ALLOW_UNAUTHENTICATED`        | `false`                | 是否允许未登录用户使用转换功能                          |
 | `AUTO_DELETE_EVERY_N_HOURS`    | `24`                   | 自动清理文件的间隔小时数，设为 `0` 可关闭               |
-| `WEBROOT`                      | 空                     | 应用子路径，例如 `/convert`                             |
+| `WEBROOT`                      | 空                     | 尽量不变，保持空白就好                                 |
 | `FFMPEG_ARGS`                  | 空                     | 传给 ffmpeg 输入端的额外参数                            |
 | `FFMPEG_OUTPUT_ARGS`           | 空                     | 传给 ffmpeg 输出端的额外参数                            |
 | `HIDE_HISTORY`                 | `false`                | 是否隐藏历史记录页面                                    |
@@ -109,6 +110,8 @@ ConvertX-extend 继承了 ConvertX 的转换器体系，包括：
 - VTracer
 - Markitdown
 
+图片尺寸设置目前只对支持该能力的转换器显示。普通图片转换可使用 ImageMagick 或 GraphicsMagick 调整大小和裁剪；生成 macOS 图标时可选择 `icns`，并使用尺寸输入控制生成的图标素材大小。FFmpeg 本身支持视频缩放和裁剪，但当前页面的图片尺寸设置尚未接入 FFmpeg。
+
 ### 截图
 
 ![ConvertX-extend Preview](images/preview.png)
@@ -127,7 +130,8 @@ This version mainly includes:
 
 - Project rename to `ConvertX-extend`
 - Chinese UI copy adjustments
-- Image size options
+- Image size options for ImageMagick, GraphicsMagick, and `icns` icon generation
+- Better format search, including aliases such as `ins`, `lns`, `apple`, and `icon` for `icns`
 - Chinese-commented `.env.example`
 - Removal of upstream files that are not needed here
 
@@ -194,7 +198,7 @@ Most variables are optional, but `JWT_SECRET` is strongly recommended for persis
 | `HTTP_ALLOWED`                 | `false`                  | Allow HTTP connections. Use only for trusted local deployments              |
 | `ALLOW_UNAUTHENTICATED`        | `false`                  | Allow unauthenticated users to use the service                              |
 | `AUTO_DELETE_EVERY_N_HOURS`    | `24`                     | Delete files older than this number of hours. Set `0` to disable            |
-| `WEBROOT`                      | empty                    | Serve the app from a sub-path, for example `/convert`                       |
+| `WEBROOT`                      | empty                    | Keep unchanged and leave empty unless needed                                |
 | `FFMPEG_ARGS`                  | empty                    | Extra arguments passed to ffmpeg input                                      |
 | `FFMPEG_OUTPUT_ARGS`           | empty                    | Extra arguments passed to ffmpeg output                                     |
 | `HIDE_HISTORY`                 | `false`                  | Hide the history page                                                       |
@@ -225,6 +229,8 @@ ConvertX-extend inherits the converter set from ConvertX, including:
 - Potrace
 - VTracer
 - Markitdown
+
+Image size options are shown only for converters that support them. Regular image conversions can use ImageMagick or GraphicsMagick for resize and crop operations. For macOS icons, choose `icns` and use the size fields to control generated icon source sizes. FFmpeg supports video scaling and cropping, but the current UI image size fields are not wired to FFmpeg yet.
 
 ### Screenshots
 
