@@ -162,6 +162,25 @@ type ConvertResult = {
   errorMessage?: string;
 };
 
+const batchImageSizeConverters = new Set(["imagemagick", "graphicsmagick"]);
+const imageSizeOptionConverters = new Set([...batchImageSizeConverters, "icns"]);
+
+export function converterSupportsImageSizeOptions(converterName: string): boolean {
+  return imageSizeOptionConverters.has(converterName);
+}
+
+export function converterSupportsBatchImageOutputs(converterName: string): boolean {
+  return batchImageSizeConverters.has(converterName);
+}
+
+export function getTargetSearchTerms(target: string, converterName: string): string {
+  const aliases: Record<string, string[]> = {
+    icns: ["ins", "lns", "apple", "icon", "mac", "macos"],
+  };
+
+  return [target, converterName, ...(aliases[target] ?? [])].join(" ");
+}
+
 function getBatchSizes(options: unknown): { width: number; height: number }[] {
   if (typeof options !== "object" || options === null || !("batchSizes" in options)) {
     return [];
@@ -223,7 +242,9 @@ export async function handleConvert(
       const fileTypeOrig = fileName.includes(".") ? (fileName.split(".").pop() ?? "") : "";
       const fileType = normalizeFiletype(fileTypeOrig);
       const newFileExt = normalizeOutputFiletype(convertTo);
-      const batchSizes = converterName === "imagemagick" ? getBatchSizes(options) : [];
+      const batchSizes = converterSupportsBatchImageOutputs(converterName)
+        ? getBatchSizes(options)
+        : [];
       const outputPlans =
         batchSizes.length > 0
           ? batchSizes.map((size) => ({

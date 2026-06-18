@@ -9,12 +9,12 @@ let formatSelected = false;
 
 const imageOptions = document.getElementById("image-options");
 
-const updateImageOptions = (converter) => {
+const updateImageOptions = (enabled) => {
   if (!imageOptions) {
     return;
   }
 
-  if (converter === "imagemagick") {
+  if (enabled === true || enabled === "true") {
     imageOptions.classList.remove("hidden");
     imageOptions.classList.add("flex");
     imageOptions.setAttribute("aria-hidden", "false");
@@ -100,7 +100,8 @@ const updateSearchBar = () => {
     for (const [targets, groupElement] of Object.values(convertToGroups)) {
       let matchingTargetsFound = 0;
       for (const target of targets) {
-        if (target.dataset.target.includes(search)) {
+        const searchableText = target.dataset.search || target.dataset.target || "";
+        if (searchableText.includes(search)) {
           matchingTargetsFound++;
           target.classList.remove("hidden");
           target.classList.add("flex");
@@ -130,7 +131,7 @@ const updateSearchBar = () => {
       target.onmousedown = () => {
         convertToElement.value = target.dataset.value;
         convertToInput.value = `${target.dataset.target}，使用 ${target.dataset.converter}`;
-        updateImageOptions(target.dataset.converter);
+        updateImageOptions(target.dataset.imageOptions);
         formatSelected = true;
         if (pendingFiles === 0 && fileNames.length > 0) {
           convertButton.disabled = false;

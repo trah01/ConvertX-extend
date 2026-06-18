@@ -2,6 +2,7 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { execFile as execFileOriginal } from "node:child_process";
+import { buildImageSizeArgs } from "./imageSizeOptions";
 import { ExecFileFn } from "./types";
 
 type IconSize = {
@@ -10,6 +11,8 @@ type IconSize = {
 };
 
 type IcnsOptions = {
+  resizeWidth?: number;
+  resizeHeight?: number;
   batchSizes?: IconSize[];
 };
 
@@ -47,24 +50,43 @@ export const properties = {
 };
 
 function getIconSizes(options: unknown): IconSize[] {
-  if (typeof options !== "object" || options === null || !("batchSizes" in options)) {
+  if (typeof options !== "object" || options === null) {
     return defaultIconSizes;
   }
 
   const sizes = (options as IcnsOptions).batchSizes;
-  if (!Array.isArray(sizes) || sizes.length === 0) {
-    return defaultIconSizes;
+  const batchSizes = Array.isArray(sizes)
+    ? sizes.filter(
+        (size) =>
+          Number.isSafeInteger(size.width) &&
+          Number.isSafeInteger(size.height) &&
+          size.width > 0 &&
+          size.height > 0 &&
+          size.width <= 1024 &&
+          size.height <= 1024,
+      )
+    : [];
+
+  if (batchSizes.length > 0) {
+    return batchSizes;
   }
 
-  return sizes.filter(
-    (size) =>
-      Number.isSafeInteger(size.width) &&
-      Number.isSafeInteger(size.height) &&
-      size.width > 0 &&
-      size.height > 0 &&
-      size.width <= 1024 &&
-      size.height <= 1024,
-  );
+  const resizeWidth = (options as IcnsOptions).resizeWidth;
+  const resizeHeight = (options as IcnsOptions).resizeHeight;
+  if (
+    Number.isSafeInteger(resizeWidth) &&
+    Number.isSafeInteger(resizeHeight) &&
+    resizeWidth &&
+    resizeHeight &&
+    resizeWidth > 0 &&
+    resizeHeight > 0 &&
+    resizeWidth <= 1024 &&
+    resizeHeight <= 1024
+  ) {
+    return [{ width: resizeWidth, height: resizeHeight }];
+  }
+
+  return defaultIconSizes;
 }
 
 function execFilePromise(execFile: ExecFileFn, cmd: string, args: string[]): Promise<void> {
@@ -107,6 +129,7 @@ export async function convert(
       const pngPath = join(workDir, `icon-${size.width}x${size.height}.png`);
       await execFilePromise(execFile, "magick", [
         filePath,
+        ...buildImageSizeArgs(options),
         "-background",
         "none",
         "-resize",

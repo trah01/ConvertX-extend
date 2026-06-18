@@ -2,7 +2,7 @@ import { mkdir } from "node:fs/promises";
 import { Elysia, t } from "elysia";
 import sanitize from "sanitize-filename";
 import { outputDir, uploadsDir } from "..";
-import { handleConvert } from "../converters/main";
+import { converterSupportsBatchImageOutputs, handleConvert } from "../converters/main";
 import db from "../db/db";
 import { Jobs } from "../db/types";
 import { WEBROOT } from "../helpers/env";
@@ -144,7 +144,7 @@ export const convert = new Elysia().use(userService).post(
     }
 
     const outputCount =
-      converterName === "imagemagick" && imageOptions.batchSizes.length > 0
+      converterSupportsBatchImageOutputs(converterName) && imageOptions.batchSizes.length > 0
         ? fileNames.length * imageOptions.batchSizes.length
         : fileNames.length;
 

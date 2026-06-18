@@ -1,4 +1,5 @@
 import { execFile as execFileOriginal } from "node:child_process";
+import { buildImageSizeArgs } from "./imageSizeOptions";
 import { ExecFileFn } from "./types";
 
 export const properties = {
@@ -318,20 +319,24 @@ export function convert(
   execFile: ExecFileFn = execFileOriginal, // to make it mockable
 ): Promise<string> {
   return new Promise((resolve, reject) => {
-    execFile("gm", ["convert", filePath, targetPath], (error, stdout, stderr) => {
-      if (error) {
-        reject(`error: ${error}`);
-      }
+    execFile(
+      "gm",
+      ["convert", filePath, ...buildImageSizeArgs(options), targetPath],
+      (error, stdout, stderr) => {
+        if (error) {
+          reject(`error: ${error}`);
+        }
 
-      if (stdout) {
-        console.log(`stdout: ${stdout}`);
-      }
+        if (stdout) {
+          console.log(`stdout: ${stdout}`);
+        }
 
-      if (stderr) {
-        console.error(`stderr: ${stderr}`);
-      }
+        if (stderr) {
+          console.error(`stderr: ${stderr}`);
+        }
 
-      resolve("Done");
-    });
+        resolve("Done");
+      },
+    );
   });
 }

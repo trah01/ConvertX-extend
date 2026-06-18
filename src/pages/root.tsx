@@ -3,7 +3,11 @@ import { JWTPayloadSpec } from "@elysiajs/jwt";
 import { Elysia, t } from "elysia";
 import { BaseHtml } from "../components/base";
 import { Header } from "../components/header";
-import { getAllTargets } from "../converters/main";
+import {
+  converterSupportsImageSizeOptions,
+  getAllTargets,
+  getTargetSearchTerms,
+} from "../converters/main";
 import db from "../db/db";
 import { User } from "../db/types";
 import {
@@ -197,6 +201,10 @@ export const root = new Elysia().use(userService).get(
                               data-value={`${target},${converter}`}
                               data-target={target}
                               data-converter={converter}
+                              data-image-options={
+                                converterSupportsImageSizeOptions(converter) ? "true" : "false"
+                              }
+                              data-search={getTargetSearchTerms(target, converter)}
                               type="button"
                               safe
                             >

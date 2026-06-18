@@ -1,5 +1,9 @@
 import Elysia, { t } from "elysia";
-import { getPossibleTargets } from "../converters/main";
+import {
+  converterSupportsImageSizeOptions,
+  getPossibleTargets,
+  getTargetSearchTerms,
+} from "../converters/main";
 import { userService } from "./user";
 
 export const chooseConverter = new Elysia().use(userService).post(
@@ -34,6 +38,10 @@ export const chooseConverter = new Elysia().use(userService).post(
                     data-value={`${target},${converter}`}
                     data-target={target}
                     data-converter={converter}
+                    data-image-options={
+                      converterSupportsImageSizeOptions(converter) ? "true" : "false"
+                    }
+                    data-search={getTargetSearchTerms(target, converter)}
                     type="button"
                     safe
                   >
